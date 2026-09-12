@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://emi-calculator-orcin.vercel.app/sitemap.xml

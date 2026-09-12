@@ -2,25 +2,98 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='4' width='20' height='16' rx='2'/><line x1='6' y1='8' x2='6.01' y2='8'/><line x1='10' y1='8' x2='10.01' y2='8'/><line x1='14' y1='8' x2='14.01' y2='8'/><line x1='18' y1='8' x2='18.01' y2='8'/><line x1='6' y1='12' x2='18' y2='12'/><line x1='6' y1='16' x2='10' y2='16'/><line x1='14' y1='16' x2='18' y2='16'/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a0e17" />
-    <meta name="description" content="Advanced EMI Calculator with amortization schedule, loan comparison, prepayment simulator, and PostgreSQL history storage." />
-    <title>Smart EMI Calculator | Loan Planning & Amortization</title>
+    <title>Free EMI Calculator Online - Calculate Home, Car & Personal Loan EMI | SmartEMI</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Calculate your loan EMI in seconds with our free Smart EMI Calculator. Instant amortization breakdown, prepayment savings simulator, bank offer comparison, and PDF export." />
+    <meta name="keywords" content="emi calculator, loan emi calculator, home loan emi calculator, car loan emi calculator, personal loan emi calculator, prepayment calculator, amortization schedule, smart emi" />
+    <meta name="author" content="SmartEMI" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://emi-calculator-orcin.vercel.app/" />
 
-    <!-- PWA Manifest & App Metadata -->
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://emi-calculator-orcin.vercel.app/" />
+    <meta property="og:title" content="Free EMI Calculator Online - Calculate Home, Car & Personal Loan EMI | SmartEMI" />
+    <meta property="og:description" content="Instant loan EMI calculations with monthly repayment schedules, prepayment interest savings, and bank loan comparisons." />
+    <meta property="og:image" content="https://emi-calculator-orcin.vercel.app/icons/icon-512x512.png" />
+    <meta property="og:site_name" content="SmartEMI" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Free EMI Calculator Online | SmartEMI" />
+    <meta name="twitter:description" content="Calculate loan EMIs, view amortization schedules, and simulate prepayment interest savings in seconds." />
+    <meta name="twitter:image" content="https://emi-calculator-orcin.vercel.app/icons/icon-512x512.png" />
+
+    <!-- Favicon & PWA Manifest -->
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="SmartEMI" />
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Structured Data (JSON-LD) for Google Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://emi-calculator-orcin.vercel.app/#app",
+          "name": "SmartEMI Calculator",
+          "url": "https://emi-calculator-orcin.vercel.app/",
+          "description": "Free online loan EMI calculator with amortization schedule, prepayment interest savings simulator, and dual bank comparison.",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "All",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://emi-calculator-orcin.vercel.app/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How is EMI calculated?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "EMI is calculated using the standard formula: EMI = [P x R x (1+R)^N] / [(1+R)^N - 1], where P is Principal loan amount, R is the monthly interest rate, and N is the tenure in number of months."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does prepaying a loan reduce overall interest?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Every extra monthly or lump sum payment directly reduces the outstanding principal balance, thereby drastically lowering the cumulative compound interest charged by the lender and shortening loan tenure."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I calculate EMI for Home, Car, and Personal loans?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, SmartEMI supports instant calculations for Home Loans, Car Loans, Education Loans, and Personal Loans with customizable interest rates and flexible tenures."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
