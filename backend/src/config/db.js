@@ -42,15 +42,21 @@ const saveMemoryStore = () => {
 };
 
 try {
-  const connectionConfig = process.env.DATABASE_URL
-    ? { connectionString: process.env.DATABASE_URL }
+  const isCloudDb = Boolean(process.env.DATABASE_URL);
+  const connectionConfig = isCloudDb
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      }
     : {
         user: process.env.PGUSER || 'postgres',
         host: process.env.PGHOST || 'localhost',
         database: process.env.PGDATABASE || 'emi_calculator',
         password: process.env.PGPASSWORD || 'postgres',
         port: parseInt(process.env.PGPORT || '5432', 10),
-        connectionTimeoutMillis: 3000,
+        connectionTimeoutMillis: 5000,
       };
 
   pool = new Pool(connectionConfig);
