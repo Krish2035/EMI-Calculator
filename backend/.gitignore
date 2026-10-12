@@ -21,6 +21,8 @@ pids
 *.seed
 *.pid.lock
 coverage/
+src/data/users.json
+src/data/calculations.json
 
 # OS & Editor files
 .DS_Store

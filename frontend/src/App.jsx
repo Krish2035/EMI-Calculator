@@ -10,6 +10,8 @@ import SavedCalculations from './components/SavedCalculations';
 import SaveModal from './components/SaveModal';
 import AffordabilityMeter from './components/AffordabilityMeter';
 import HumanAdvisorCard from './components/HumanAdvisorCard';
+import AuthPage from './components/AuthPage';
+import { logoutFirebase } from './services/firebase';
 import { generateAmortization, calculateEMI } from './utils/calculator';
 import { api } from './services/api';
 import { usePWA } from './hooks/usePWA';
@@ -50,6 +52,17 @@ export default function App() {
   // Backend & Database Health
   const [dbStatus, setDbStatus] = useState({ connected: false, mode: 'checking...' });
   const [toast, setToast] = useState(null);
+
+  // Authentication State (Hashed Passwords / Firebase Google OAuth)
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('smart_emi_user');
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+  const [isGuest, setIsGuest] = useState(false);
 
   // Synchronize theme attribute
   useEffect(() => {
@@ -218,6 +231,63 @@ export default function App() {
     showToast(`Loaded "${record.title}"`);
   };
 
+  // Auth Handlers
+  const handleAuthSuccess = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('smart_emi_user', JSON.stringify(user));
+    showToast(`Welcome, ${user.name || user.email}!`);
+    loadInitialData();
+  };
+
+  const handleContinueGuest = () => {
+    setIsGuest(true);
+    showToast('Browsing as Guest');
+  };
+
+  const handleLogout = async () => {
+    api.clearToken();
+    localStorage.removeItem('smart_emi_user');
+    setCurrentUser(null);
+    setIsGuest(false);
+    try {
+      await logoutFirebase();
+    } catch (e) {}
+    showToast('Logged out successfully');
+  };
+
+  // Home Page: If not authenticated & not continuing as guest, show Sign In / Sign Up page
+  if (!currentUser && !isGuest) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        {toast && (
+          <div style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 9999,
+            background: toast.type === 'error' ? '#ef4444' : '#10b981',
+            color: '#ffffff',
+            padding: '12px 20px',
+            borderRadius: '12px',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            {toast.type === 'error' ? <AlertCircle size={18} /> : <Check size={18} />}
+            <span>{toast.message}</span>
+          </div>
+        )}
+        <AuthPage
+          onAuthSuccess={handleAuthSuccess}
+          onContinueGuest={handleContinueGuest}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+      </div>
+    );
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Toast Notification */}
@@ -272,6 +342,9 @@ export default function App() {
         isInstallable={isInstallable}
         onInstall={promptInstall}
         isOnline={isOnline}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onOpenAuth={() => setIsGuest(false)}
       />
 
       {/* Main Container */}

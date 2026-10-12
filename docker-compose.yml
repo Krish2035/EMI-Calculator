@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # 1. Primary Master Database (Writes, Drizzle Migrations)
+  postgres-primary:
+    image: postgres:16-alpine
+    container_name: emi-postgres-primary
+    restart: always
+    environment:
+      POSTGRES_USER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-postgres}
+      POSTGRES_DB: ${PGDATABASE:-emi_calculator}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_primary_data:/var/lib/postgresql/data
+      - ./backend/src/db/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d emi_calculator"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - emi-network
+
+  # 2. Read Replica Database (Read Queries & Load Distribution)
+  postgres-replica:
+    image: postgres:16-alpine
+    container_name: emi-postgres-replica
+    restart: always
+    environment:
+      POSTGRES_USER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-postgres}
+      POSTGRES_DB: ${PGDATABASE:-emi_calculator}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_replica_data:/var/lib/postgresql/data
+      - ./backend/src/db/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d emi_calculator"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - emi-network
+
+  # 3. Redis Cache & BullMQ Queue Broker
+  redis:
+    image: redis:7-alpine
+    container_name: emi-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - emi-network
+
+  # 4. Backend Service (Node.js Cluster, Drizzle ORM, BullMQ, Swagger)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: emi-backend
+    restart: always
+    environment:
+      PORT: 5000
+      PGHOST: postgres-primary
+      PGPORT: 5432
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-postgres}
+      PGDATABASE: ${PGDATABASE:-emi_calculator}
+      DATABASE_READ_REPLICAS: postgresql://postgres:postgres@postgres-replica:5432/emi_calculator
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-smart-emi-enterprise-jwt-token-secret-2026}
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      postgres-replica:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - emi-network
+
+  # 5. Frontend Client (Vite React PWA)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: emi-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - emi-network
+
+  # 6. High-Availability Nginx Load Balancer & Reverse Proxy
+  load-balancer:
+    image: nginx:alpine
+    container_name: emi-load-balancer
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - emi-network
+
+networks:
+  emi-network:
+    driver: bridge
+
+volumes:
+  pg_primary_data:
+  pg_replica_data:
+  redis_data:

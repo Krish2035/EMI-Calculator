@@ -5,11 +5,11 @@ import {
   Sun,
   Database,
   BookmarkCheck,
-  CheckCircle2,
-  AlertTriangle,
-  RefreshCw,
   Download,
   WifiOff,
+  LogOut,
+  User,
+  LogIn,
 } from 'lucide-react';
 import { CURRENCIES } from '../utils/formatters';
 
@@ -27,6 +27,9 @@ export default function Navbar({
   isInstallable,
   onInstall,
   isOnline = true,
+  currentUser,
+  onLogout,
+  onOpenAuth,
 }) {
   return (
     <header style={{
@@ -67,9 +70,11 @@ export default function Navbar({
               <span style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 SmartEMI
               </span>
-              <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>Friendly Companion</span>
+              <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>Enterprise Suite</span>
             </div>
-            <p className="hide-on-mobile" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Your Friendly Loan Planning Companion</p>
+            <p className="hide-on-mobile" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Top 1% Tier Financial Planning Architecture
+            </p>
           </div>
         </div>
 
@@ -80,8 +85,8 @@ export default function Navbar({
             onClick={onRefreshStatus}
             title={
               dbStatus.connected
-                ? `PostgreSQL Connected: ${dbStatus.config?.database || 'emi_calculator'} on port ${dbStatus.config?.port || 5432} (Click to refresh)`
-                : `Storage: ${dbStatus.mode} (Click to re-check PostgreSQL connection)`
+                ? `PostgreSQL & Drizzle ORM Connected: ${dbStatus.config?.database || 'emi_calculator'} (Click to refresh)`
+                : `Storage: ${dbStatus.mode} (Click to re-check)`
             }
             style={{
               display: 'flex',
@@ -100,8 +105,8 @@ export default function Navbar({
             }}
           >
             <Database size={13} />
-            <span className="hide-on-mobile">{dbStatus.connected ? 'PostgreSQL Active' : 'Session Store'}</span>
-            <span className="show-on-mobile">{dbStatus.connected ? 'PG' : 'Store'}</span>
+            <span className="hide-on-mobile">{dbStatus.connected ? 'Drizzle & Replicas' : 'Session Store'}</span>
+            <span className="show-on-mobile">{dbStatus.connected ? 'ORM' : 'Store'}</span>
             <span style={{
               width: '7px',
               height: '7px',
@@ -148,7 +153,7 @@ export default function Navbar({
             )}
           </button>
 
-          {/* Font Size Toggle for Accessibility (Older & Younger generation friendly) */}
+          {/* Font Size Toggle */}
           <button
             onClick={toggleFontSize}
             className="btn-secondary"
@@ -159,10 +164,9 @@ export default function Navbar({
               background: fontSize === 'large' ? 'var(--primary-glow)' : 'transparent',
               borderColor: fontSize === 'large' ? 'var(--primary)' : 'var(--border-color)',
             }}
-            title={fontSize === 'large' ? 'Text Size: Large (Click for Normal)' : 'Text Size: Normal (Click for Large)'}
+            title={fontSize === 'large' ? 'Text Size: Large' : 'Text Size: Normal'}
           >
             <span style={{ fontSize: fontSize === 'large' ? '1rem' : '0.85rem' }}>Aa</span>
-            <span className="hide-on-mobile" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{fontSize === 'large' ? 'Large' : 'Normal'}</span>
           </button>
 
           {/* Dark / Light Toggle */}
@@ -170,11 +174,88 @@ export default function Navbar({
             onClick={toggleTheme}
             className="btn-secondary"
             aria-label="Toggle Theme"
-            title={theme === 'dark' ? 'Switch to Clean Light Theme' : 'Switch to Dark Theme'}
             style={{ padding: '8px', borderRadius: '10px' }}
           >
             {theme === 'dark' ? <Sun size={17} color="#fbbf24" /> : <Moon size={17} color="#6366f1" />}
           </button>
+
+          {/* User Profile / Logout or Sign In */}
+          {currentUser ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 8px 4px 4px',
+              borderRadius: '9999px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid var(--border-color)',
+            }}>
+              {currentUser.avatarUrl ? (
+                <img
+                  src={currentUser.avatarUrl}
+                  alt={currentUser.name}
+                  style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                }}>
+                  {(currentUser.name || currentUser.email || 'U')[0].toUpperCase()}
+                </div>
+              )}
+              <span className="hide-on-mobile" style={{
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                maxWidth: '120px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}>
+                {currentUser.name || currentUser.email}
+              </span>
+              <button
+                onClick={onLogout}
+                title="Log Out"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#ef4444',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="btn-primary"
+              style={{
+                padding: '6px 12px',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                borderRadius: '9999px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <LogIn size={14} />
+              <span>Sign In</span>
+            </button>
+          )}
 
           {/* Offline Mode Indicator */}
           {!isOnline && (
@@ -191,10 +272,9 @@ export default function Navbar({
                 fontSize: '0.75rem',
                 fontWeight: 700,
               }}
-              title="Working offline. All calculations and schedules run locally on your device."
             >
               <WifiOff size={13} />
-              <span>Offline Mode ⚡</span>
+              <span>Offline</span>
             </div>
           )}
 
@@ -211,12 +291,10 @@ export default function Navbar({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                animation: 'pulseGlow 2.5s infinite',
               }}
-              title="Install SmartEMI on your device for fast offline access"
             >
               <Download size={14} />
-              <span>Install App</span>
+              <span>Install</span>
             </button>
           )}
         </div>
