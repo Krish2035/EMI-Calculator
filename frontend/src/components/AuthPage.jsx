@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { api } from '../services/api';
 import { signInWithGoogle } from '../services/firebase';
+import financialVideo from '../../resources/Financial_application.mp4';
 import {
   Lock,
   Mail,
@@ -16,6 +17,12 @@ import {
   CheckCircle2,
   AlertCircle,
   Calculator,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export default function AuthPage({ onAuthSuccess, onContinueGuest, theme, toggleTheme }) {
@@ -28,6 +35,30 @@ export default function AuthPage({ onAuthSuccess, onContinueGuest, theme, toggle
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Video playback & audio controls
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
 
   // Real-time password strength calculation
   const getPasswordStrength = (pass) => {
@@ -112,65 +143,260 @@ export default function AuthPage({ onAuthSuccess, onContinueGuest, theme, toggle
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px 16px',
+      padding: '32px 20px',
       position: 'relative',
       overflow: 'hidden',
       background: 'var(--bg-main, #0b0f19)',
     }}>
+      {/* Theme Toggle in Top Corner */}
+      {toggleTheme && (
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '24px',
+            zIndex: 30,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 14px',
+            borderRadius: '999px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            color: 'var(--text-main, #f8fafc)',
+            fontSize: '0.82rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)')}
+        >
+          {theme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#6366f1" />}
+          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+        </button>
+      )}
+
       {/* Dynamic Ambient Background Glows */}
       <div style={{
         position: 'absolute',
         top: '-15%',
         left: '-10%',
-        width: '550px',
-        height: '550px',
+        width: '600px',
+        height: '600px',
         borderRadius: '50%',
         background: 'radial-gradient(circle, rgba(59, 130, 246, 0.22) 0%, rgba(0, 0, 0, 0) 70%)',
-        filter: 'blur(60px)',
+        filter: 'blur(70px)',
         pointerEvents: 'none',
       }} />
       <div style={{
         position: 'absolute',
         bottom: '-15%',
         right: '-10%',
-        width: '550px',
-        height: '550px',
+        width: '600px',
+        height: '600px',
         borderRadius: '50%',
         background: 'radial-gradient(circle, rgba(139, 92, 246, 0.20) 0%, rgba(0, 0, 0, 0) 70%)',
-        filter: 'blur(60px)',
+        filter: 'blur(70px)',
         pointerEvents: 'none',
       }} />
 
-      {/* Main Glassmorphism Auth Card */}
-      <div style={{
-        width: '100%',
-        maxWidth: '460px',
-        zIndex: 10,
-        background: 'var(--bg-card, rgba(17, 24, 39, 0.85))',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderRadius: '24px',
-        border: '1px solid var(--border-color, rgba(255, 255, 255, 0.1))',
-        boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.1)',
-        padding: '36px 32px',
-        animation: 'fadeInUp 0.4s ease-out',
-      }}>
-        {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '56px',
-            height: '56px',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-            color: '#fff',
-            boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
-            marginBottom: '16px',
-          }}>
-            <Calculator size={30} />
+      {/* Split Responsive Presentation Wrapper */}
+      <div className="auth-split-wrapper">
+        {/* LEFT COLUMN: Financial Application Video Showcase */}
+        <div className="auth-video-container">
+          {/* Glassmorphic Video Showcase Player Card */}
+          <div className="auth-video-card">
+            {/* Top Mac-style bar */}
+            <div className="auth-video-topbar">
+              <div className="auth-video-dots">
+                <span className="auth-video-dot" style={{ background: '#ef4444' }} />
+                <span className="auth-video-dot" style={{ background: '#f59e0b' }} />
+                <span className="auth-video-dot" style={{ background: '#10b981' }} />
+              </div>
+
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '0.75rem',
+                color: 'var(--text-muted, #94a3b8)',
+                fontWeight: 600,
+              }}>
+                <Calculator size={13} color="#60a5fa" />
+                <span>Financial_application.mp4</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {/* Media Play/Pause & Mute Buttons */}
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  className="auth-video-btn"
+                  title={isPlaying ? 'Pause video' : 'Play video'}
+                  aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                >
+                  {isPlaying ? <Pause size={13} /> : <Play size={13} />}
+                  <span>{isPlaying ? 'Pause' : 'Play'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  className="auth-video-btn"
+                  title={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+                  aria-label={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+                >
+                  {isMuted ? <VolumeX size={13} /> : <Volume2 size={13} />}
+                  <span>{isMuted ? 'Muted' : 'Audio'}</span>
+                </button>
+
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  color: '#10b981',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  padding: '4px 9px',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                }}>
+                  <span style={{
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: '#10b981',
+                    display: 'inline-block',
+                    boxShadow: '0 0 8px #10b981',
+                  }} />
+                  <span>Live Demo</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Video Player */}
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              className="auth-video-player"
+            >
+              <source src={financialVideo} type="video/mp4" />
+              <source src="/resources/Financial_application.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+
+            {/* Bottom Glass/Gradient Text Overlay */}
+            <div className="auth-video-bottom-overlay">
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '5px 12px',
+                borderRadius: '999px',
+                background: 'rgba(59, 130, 246, 0.18)',
+                border: '1px solid rgba(59, 130, 246, 0.35)',
+                color: '#60a5fa',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                width: 'fit-content',
+              }}>
+                <Sparkles size={14} />
+                <span>Interactive Financial Suite</span>
+              </div>
+
+              <h2 style={{
+                fontSize: 'clamp(1.4rem, 2.2vw, 1.85rem)',
+                fontWeight: 800,
+                color: '#ffffff',
+                lineHeight: 1.25,
+                letterSpacing: '-0.025em',
+                margin: 0,
+              }}>
+                Master Your Loans with{' '}
+                <span style={{
+                  background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}>
+                  Smart EMI Intelligence
+                </span>
+              </h2>
+
+              <p style={{
+                fontSize: '0.88rem',
+                color: '#cbd5e1',
+                lineHeight: 1.5,
+                margin: 0,
+              }}>
+                Watch dynamic monthly amortization, instant prepayment interest savings, and real-time loan comparisons in action.
+              </p>
+
+              {/* Feature Pills Row */}
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
+                marginTop: '4px',
+              }}>
+                <div className="auth-feature-pill">
+                  <TrendingUp size={15} color="#60a5fa" />
+                  <span>Dynamic EMI</span>
+                </div>
+                <div className="auth-feature-pill">
+                  <Zap size={15} color="#34d399" />
+                  <span>Prepayment Power</span>
+                </div>
+                <div className="auth-feature-pill">
+                  <PieChart size={15} color="#c084fc" />
+                  <span>Visual Breakdown</span>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* RIGHT COLUMN: Main Glassmorphism Auth Card */}
+        <div style={{
+          width: '100%',
+          maxWidth: '460px',
+          margin: '0 auto',
+          zIndex: 10,
+          background: 'var(--bg-card, rgba(17, 24, 39, 0.85))',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRadius: '24px',
+          border: '1px solid var(--border-color, rgba(255, 255, 255, 0.1))',
+          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.1)',
+          padding: '36px 32px',
+          animation: 'fadeInRight 0.4s ease-out',
+        }}>
+          {/* Brand Header */}
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '56px',
+              height: '56px',
+              borderRadius: '16px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              color: '#fff',
+              boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
+              marginBottom: '16px',
+            }}>
+              <Calculator size={30} />
+            </div>
 
           <h1 style={{
             fontSize: '1.65rem',
@@ -629,5 +855,6 @@ export default function AuthPage({ onAuthSuccess, onContinueGuest, theme, toggle
         </div>
       </div>
     </div>
+  </div>
   );
 }
