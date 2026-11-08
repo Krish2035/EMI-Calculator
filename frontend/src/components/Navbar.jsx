@@ -73,7 +73,7 @@ export default function Navbar({
               <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>Enterprise Suite</span>
             </div>
             <p className="hide-on-mobile" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Top 1% Tier Financial Planning Architecture
+              EMI Calculator on Vercel • Free &amp; Offline PWA
             </p>
           </div>
         </div>

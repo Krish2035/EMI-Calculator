@@ -11,6 +11,7 @@ import SaveModal from './components/SaveModal';
 import AffordabilityMeter from './components/AffordabilityMeter';
 import HumanAdvisorCard from './components/HumanAdvisorCard';
 import AuthPage from './components/AuthPage';
+import SEOSection from './components/SEOSection';
 import { logoutFirebase } from './services/firebase';
 import { generateAmortization, calculateEMI } from './utils/calculator';
 import { api } from './services/api';
@@ -357,11 +358,11 @@ export default function App() {
                 {greeting}! 👋
               </span>
             </div>
-            <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '6px' }}>
-              Your Loan Planning Companion
+            <h1 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.2rem)', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '6px' }}>
+              EMI Calculator Vercel <span style={{ color: 'var(--primary)', fontWeight: 600 }}>• Smart Loan Planner</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-              Empathetic, clear loan calculations for everyone — students, home buyers, and seniors. Transparent numbers with zero hidden traps.
+              Free online EMI calculator hosted on Vercel (<a href="https://emi-calculator-orcin.vercel.app" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>emi-calculator-orcin.vercel.app</a>). Calculate Home, Car &amp; Personal Loan EMIs with instant amortization and prepayment savings.
             </p>
           </div>
 
@@ -502,18 +503,30 @@ export default function App() {
             />
           )}
         </div>
+
+        {/* SEO Educational Guide, Formula & FAQ Section */}
+        <SEOSection />
       </main>
 
       {/* Footer */}
       <footer style={{
         borderTop: '1px solid var(--border-color)',
-        padding: '20px',
+        padding: '24px 20px',
         textAlign: 'center',
         color: 'var(--text-muted)',
-        fontSize: '0.8rem',
+        fontSize: '0.85rem',
         background: 'var(--bg-card)',
+        lineHeight: 1.6,
       }}>
-        SmartEMI Calculator • Built with React, Vite, Node.js, Express & PostgreSQL
+        <div>
+          <strong style={{ color: 'var(--text-primary)' }}>EMI Calculator Vercel</strong> • Free online loan planning at{' '}
+          <a href="https://emi-calculator-orcin.vercel.app" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
+            emi-calculator-orcin.vercel.app
+          </a>
+        </div>
+        <div style={{ marginTop: '4px', fontSize: '0.78rem', opacity: 0.85 }}>
+          Calculations are for educational and planning purposes • Hosted globally on Vercel Edge Network
+        </div>
       </footer>
 
       {/* Modals & Drawers */}

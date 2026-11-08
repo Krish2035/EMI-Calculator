@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
+# Search Engine Crawlers & Sitemaps
+Host: https://emi-calculator-orcin.vercel.app
 Sitemap: https://emi-calculator-orcin.vercel.app/sitemap.xml

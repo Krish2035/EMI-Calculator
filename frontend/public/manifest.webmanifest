@@ -1,7 +1,7 @@
 {
-  "name": "SmartEMI - Loan Planning Companion",
-  "short_name": "SmartEMI",
-  "description": "Empathetic, clear EMI and loan calculations with 100% offline support, prepayment simulator, and loan comparisons.",
+  "name": "EMI Calculator Vercel - Smart Loan Planning",
+  "short_name": "EMI Calculator Vercel",
+  "description": "Free online loan EMI calculator hosted on Vercel (emi-calculator-orcin.vercel.app). Calculate Home, Car & Personal loan EMIs with amortization and prepayment savings.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -43,9 +43,9 @@
   ],
   "shortcuts": [
     {
-      "name": "New Calculation",
+      "name": "New EMI Calculation",
       "short_name": "Calculate",
-      "description": "Start a fresh loan calculation",
+      "description": "Calculate loan EMI instantly",
       "url": "/",
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     },
